@@ -1,0 +1,10 @@
+pub mod dashboard;
+pub mod gpu;
+pub mod cpu;
+pub mod memory;
+pub mod disk;
+pub mod network;
+pub mod processes;
+pub mod gpu_control;
+pub mod vram_calc;
+pub mod snapshot;

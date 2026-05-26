@@ -1,249 +1,238 @@
 <p align="center">
-  <h1 align="center">Pane</h1>
-  <p align="center"><strong>A transparent window into your system.</strong></p>
-  <p align="center">
-    <a href="#install">Install</a> &bull;
-    <a href="#why-pane">Why Pane</a> &bull;
-    <a href="#features">Features</a> &bull;
-    <a href="#screenshots">Screenshots</a> &bull;
-    <a href="#build">Build</a>
-  </p>
+  <img src="assets/logo.png" alt="Pane" width="140">
+</p>
+
+<h1 align="center">PANE</h1>
+
+<p align="center"><strong>A transparent window into your system.</strong></p>
+
+<p align="center">
+Your OS hides what your hardware is actually doing. Pane cracks it open.<br>
+Per-process VRAM. Real GPU metrics. Hardware controls. One binary. ~5MB. No bloat.
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> &bull;
+  <a href="#install">Install</a> &bull;
+  <a href="#why-pane">Why Pane</a> &bull;
+  <a href="#platform-support">Platforms</a> &bull;
+  <a href="#current-limitations">Limitations</a> &bull;
+  <a href="#build-from-source">Build</a>
 </p>
 
 ---
 
-Your OS hides what your hardware is actually doing. Task Manager is a joke. htop doesn't know your GPU exists. HWiNFO is a spreadsheet from 2004.
+<p align="center">
+  <img src="assets/dashboard-dark.png" alt="Pane Dashboard - Dark Mode" width="900">
+</p>
 
-**Pane cracks it open.** One binary. Every platform. Real metrics. No admin required.
+<p align="center">
+  <img src="assets/dashboard.png" alt="Pane Dashboard - Light Mode" width="900">
+</p>
 
-Built by someone who writes CUDA inference engines for fun and got tired of alt-tabbing between 4 different monitoring tools to figure out why his GPU was stalling.
-
-## Why Pane
-
-Windows makes GPU monitoring deliberately opaque. WDDM abstracts away per-process VRAM. NVIDIA locks per-process utilization behind datacenter-only APIs. Task Manager shows you a percentage and calls it a day.
-
-Pane goes around all of it:
-- **Per-process GPU utilization** without admin elevation (via Windows Performance Counters, not the broken NVML path)
-- **Per-process VRAM usage** — dedicated and shared, per engine (3D, video decode, encode, copy)
-- **PCIe throughput** — actual TX/RX bandwidth in real-time, not theoretical max
-- **Thermal intelligence** — core temp, hotspot temp, VRAM temp, throttle detection
-- **Power draw** — real watts, not TDP guesses
-
-On Linux, most of this data is accessible but scattered across `/sys/class/drm`, `/proc`, `nvidia-smi`, and 6 different tools. Pane unifies it.
-
-On macOS, you get what Apple allows (which is more than you'd think).
-
-One tool. One binary. Every platform. No excuses.
+---
 
 ## Features
 
-### GPU (the reason this exists)
-- Per-process GPU engine utilization (3D, decode, encode, copy)
-- Per-process VRAM allocation (dedicated + shared)
-- Real-time PCIe bandwidth (TX/RX bytes/sec)
-- Clock speeds (core, memory, video — current and boost)
-- Temperature (core, hotspot, VRAM junction)
-- Power draw (current watts, power limit, power cap)
-- Fan speed (actual RPM, not "target percentage")
-- Thermal throttle detection and alerting
-- Multi-GPU support (heterogeneous — e.g. RTX 5090 + RTX 4090)
-- NVIDIA (NVML + NVAPI) and AMD (ADLX) backends
+### Dashboard
+
+Your whole system. One screen. Both GPUs charting utilization in real time, CPU load, RAM pressure, disk IO, network throughput, and your hungriest processes - all updating live without switching a single tab.
+
+### GPU
+
+This is why Pane exists. Utilization with filled-area charts. VRAM with history. Power draw trending over time. Core and memory clocks. Thermals - core and hotspot, charted. Fan speed. PCIe bandwidth both directions. And the part nobody else gives you: a per-GPU process table showing exactly which app is eating your VRAM and how much.
+
+Dual GPU? Switch between cards with one click.
+
+<p align="center">
+  <img src="assets/gpu.png" alt="GPU Panel" width="800">
+</p>
 
 ### CPU
-- Per-core utilization with frequency scaling
-- Thread count, context switches
-- Temperature per-core (where available)
-- Process tree with CPU attribution
+
+Total usage charted over time with every core broken out individually - utilization and frequency, live.
+
+<p align="center">
+  <img src="assets/cpu.png" alt="CPU Panel" width="800">
+</p>
 
 ### Memory
-- Physical and virtual memory pressure
-- Per-process working set, private bytes, shared
-- Commit charge and page fault rates
-- Swap/pagefile utilization
+
+How much RAM you're actually using, how much is left, and whether your swap is getting hit. History chart so you can see if something's been leaking.
+
+<p align="center">
+  <img src="assets/memory.png" alt="Memory Panel" width="800">
+</p>
 
 ### Disk
-- Per-disk read/write throughput (bytes/sec)
-- IOPS, queue depth, latency
-- Per-process disk I/O attribution
-- NVMe temperature and health (where exposed)
+
+Every drive. Capacity, usage, and live read/write throughput so you know when something's hammering your SSD.
+
+<p align="center">
+  <img src="assets/disk.png" alt="Disk Panel" width="800">
+</p>
 
 ### Network
-- Per-interface throughput (TX/RX)
-- Per-process network usage
-- Connection table (TCP/UDP active connections)
 
-### UX
-- Dense, information-rich TUI — no wasted space
-- Sparkline graphs with history
-- Sortable process table with GPU columns
-- Responsive layout — adapts to terminal size
-- Runs in any terminal (Windows Terminal, Alacritty, kitty, iTerm2, even cmd.exe)
-- Single `.exe` / single binary — no installer, no dependencies, no runtime
+Per-interface download and upload rates with session totals. See what's actually moving data.
+
+<p align="center">
+  <img src="assets/network.png" alt="Network Panel" width="800">
+</p>
+
+### Processes
+
+Full process table with **GPU% and VRAM columns** that actually work (via Windows PDH - same data source as Task Manager). Sort by any column. Filter instantly. Close or force-kill with confirmation. Don't recognize a process? Hit the search button.
+
+<p align="center">
+  <img src="assets/processes.png" alt="Processes Panel" width="800">
+</p>
+
+### GPU Control
+
+Power limit slider wired directly to NVML - it actually changes your card's power target. Requires admin, and Pane tells you upfront with a clear banner instead of silently failing. Fan speed and clock offsets coming soon (NVAPI), labeled honestly.
+
+<p align="center">
+  <img src="assets/gpu-control.png" alt="GPU Control Panel" width="800">
+</p>
+
+### VRAM Calculator
+
+53GB of VRAM across two cards - can you run Llama 70B at Q4? This panel answers that. 9 models, every quant level, context estimates, multi-GPU split indicators. No more napkin math.
+
+<p align="center">
+  <img src="assets/vram-calc.png" alt="VRAM Calculator" width="800">
+</p>
+
+### Performance Snapshot
+
+One click generates a clean text dump of every metric in your system. Copy to clipboard or save to file. Formatted so you can drop it straight into a Reddit post, GitHub issue, or Discord message without editing.
+
+<p align="center">
+  <img src="assets/snapshot.png" alt="Performance Snapshot" width="800">
+</p>
+
+### The details
+
+- **Dark / Light / System theme** - proper palette swap, not just inverted colors
+- **Click-to-copy** any value with full-precision tooltips
+- **Config persistence** - remembers your theme, window size, refresh rate across launches
+- **No console window** - pure GUI app on Windows, no terminal flashing
+- **Background metric thread** - UI never stutters, data collection is off the render path
+- **Custom branding** with embedded font and icon
+- **~5MB single binary** - no installer, no runtime, no dependencies
+
+---
 
 ## Install
 
-### Download
-Grab the latest release for your platform from [Releases](https://github.com/TxsharDev/pane/releases).
+Grab the latest release from [**Releases**](https://github.com/TxsharDev/pane/releases).
 
-```bash
-# Windows — just run it
-pane.exe
+| Platform | File |
+|----------|------|
+| Windows x64 | `pane-windows-x64.exe` |
+| Linux x64 | `pane-linux-x64` |
+| macOS x64 | `pane-macos-x64` |
+| macOS ARM64 | `pane-macos-arm64` |
 
-# Linux / macOS
-chmod +x pane
-./pane
-```
+No installer. No runtime. No dependencies. NVIDIA drivers required for GPU metrics.
 
-### Build from source
+---
+
+## Why Pane
+
+If you're running a high-end Windows rig - especially dual NVIDIA GPUs - there is no single tool that gives you deep, accurate GPU visibility without admin requirements for basic monitoring, without bloat, and without looking like it was designed in 2006.
+
+You either get sensor dumps with no context (HWiNFO), gaming overlays that can't show per-process data (Afterburner), or a Task Manager that thinks one GPU percentage is enough information. Meanwhile you're alt-tabbing between four apps trying to figure out which Chrome tab is eating 3GB of VRAM.
+
+Pane fixes that.
+
+| Tool | What's missing |
+|------|----------------|
+| **Task Manager** | One GPU percentage. No per-engine breakdown, no PCIe, no thermals, no power. |
+| **HWiNFO** | Deep sensors, but no per-process GPU data. UI hasn't changed in 20 years. |
+| **Process Explorer** | No GPU awareness. No meaningful updates in years. |
+| **Afterburner** | Gaming overlay being discontinued. No per-process data. |
+| **btop** | Excellent on Linux. Windows is a separate fork, an afterthought. |
+| **bottom** | Solid Rust TUI. GPU support is surface-level. |
+| **nvidia-smi** | Text dump. Per-process VRAM broken on consumer GPUs (WDDM). |
+
+---
+
+## Platform Support
+
+| Feature | Windows | Linux | macOS |
+|---------|---------|-------|-------|
+| CPU, RAM, Disk, Network | Full | Full | Full |
+| GPU metrics (NVIDIA) | Full (NVML + PDH) | Basic (NVML) | Limited |
+| Per-process GPU % | Yes (PDH) | No | No |
+| Per-process VRAM | Yes (PDH) | No | No |
+| GPU Control | Power limit (NVML) | Power limit (NVML) | No |
+| AMD GPU | Planned | Planned | No |
+
+**Windows with NVIDIA is the primary target.** Linux and macOS get solid system monitoring with basic GPU support where drivers allow.
+
+### How per-process GPU data works
+
+NVIDIA's NVML returns `NOT_AVAILABLE` for per-process VRAM on consumer GPUs running WDDM. Most tools stop here and show you nothing useful.
+
+Pane uses **Windows Performance Counters (PDH)** - the same data source Task Manager reads internally. GPU Engine counters for per-process utilization across engines (3D, decode, encode, copy). GPU Process Memory counters for dedicated + shared VRAM per process. No admin elevation needed. Works across NVIDIA, AMD, and Intel GPUs.
+
+PDH values may have minor variances compared to nvidia-smi (different API path). Dedicated memory tracking can lag slightly, and some driver-level allocations may not be attributed to specific processes. This is the same data and the same accuracy as Task Manager.
+
+---
+
+## Current Limitations
+
+- **Fan speed and clock offsets** need NVAPI (not yet integrated). Only power limit control works today.
+- **GPU Control requires admin** - monitoring works without elevation, but changing power limits needs it. Pane shows this clearly.
+- **Per-process GPU data is Windows-only** - no PDH equivalent on Linux/macOS with the same depth.
+- **AMD GPU support** is planned but not implemented yet.
+- **PDH collection** uses PowerShell internally, adding ~100ms overhead per cycle.
+
+---
+
+## Build from source
+
 ```bash
 git clone https://github.com/TxsharDev/pane.git
 cd pane
 cargo build --release
-# Binary at target/release/pane (.exe on Windows)
 ```
 
-### Package managers (coming soon)
-```bash
-# cargo
-cargo install pane
+Binary at `target/release/pane.exe` (Windows) or `target/release/pane` (Linux/macOS). Requires Rust 1.85+.
 
-# scoop (Windows)
-scoop install pane
+---
 
-# brew (macOS)
-brew install pane
-```
+## Tech Stack
 
-## Architecture
+Immediate-mode GUI via [egui](https://github.com/emilk/egui) with hardware-accelerated rendering (eframe, glow backend). System metrics via [sysinfo](https://github.com/GuillaumeGomez/sysinfo). NVIDIA GPU via [nvml-wrapper](https://github.com/Cldfire/nvml-wrapper). Per-process GPU on Windows via [windows-rs](https://github.com/microsoft/windows-rs) PDH. CI builds for Windows, Linux, macOS (x64 + ARM64) via GitHub Actions.
 
-```
-pane
-├── src/
-│   ├── main.rs              # Entry point, event loop, render loop
-│   ├── app.rs               # Application state machine
-│   ├── ui/                  # TUI layout and widgets (ratatui)
-│   │   ├── gpu.rs           # GPU panel rendering
-│   │   ├── cpu.rs           # CPU panel rendering
-│   │   ├── memory.rs        # Memory panel rendering
-│   │   ├── disk.rs          # Disk panel rendering
-│   │   ├── network.rs       # Network panel rendering
-│   │   └── processes.rs     # Process table with GPU columns
-│   ├── metrics/             # Platform-abstracted data collection
-│   │   ├── gpu/
-│   │   │   ├── mod.rs       # GPU metrics trait
-│   │   │   ├── nvml.rs      # NVIDIA backend (NVML + NVAPI)
-│   │   │   ├── adlx.rs      # AMD backend (ADLX via FFI)
-│   │   │   ├── pdh.rs       # Windows Performance Counters (per-process GPU)
-│   │   │   └── sysfs.rs     # Linux /sys/class/drm fallback
-│   │   ├── cpu.rs
-│   │   ├── memory.rs
-│   │   ├── disk.rs
-│   │   └── network.rs
-│   └── platform/            # OS-specific abstractions
-│       ├── windows.rs
-│       ├── linux.rs
-│       └── macos.rs
-├── Cargo.toml
-├── CHANGELOG.md
-└── README.md
-```
-
-### Tech Stack
-
-| Layer | Choice | Why |
-|-------|--------|-----|
-| TUI framework | [ratatui](https://github.com/ratatui/ratatui) | 20k+ stars, immediate-mode, diff-based rendering |
-| Terminal backend | [crossterm](https://github.com/crossterm-rs/crossterm) | Only real option with full Windows support |
-| System metrics | [sysinfo](https://github.com/GuillaumeGomez/sysinfo) | Battle-tested, cross-platform CPU/RAM/disk/net |
-| NVIDIA GPU | [nvml-wrapper](https://github.com/Cldfire/nvml-wrapper) | Rust bindings for NVML — temp, power, clocks, PCIe |
-| Windows GPU (per-process) | [windows-rs](https://github.com/microsoft/windows-rs) + PDH | Vendor-agnostic per-process GPU utilization |
-| AMD GPU | ADLX via FFI | AMD's official monitoring SDK |
-| Async runtime | [tokio](https://github.com/tokio-rs/tokio) | Background metric polling without blocking UI |
-
-### How Pane gets GPU data on Windows (the hard part)
-
-Windows hides GPU metrics behind WDDM. NVIDIA's NVML returns `NOT_AVAILABLE` for per-process VRAM on consumer GPUs (WDDM mode). Most tools give up here.
-
-Pane doesn't:
-
-1. **Per-process GPU utilization** — PDH `GPU Engine` counters. Same source as Task Manager, but we expose per-engine breakdown (3D vs decode vs encode vs copy). No admin needed.
-2. **Per-process VRAM** — PDH `GPU Process Memory` counters. Dedicated and shared, per-process. No admin needed.
-3. **Hardware metrics** — NVML for temp/power/clocks/PCIe (device-level, no admin). NVAPI undocumented calls for hotspot temp, VRAM temp, actual fan RPM.
-4. **AMD path** — ADLX for device-level hardware metrics + same PDH counters for per-process data.
-
-No admin elevation. No kernel driver. No "run as administrator" popup. It just works.
-
-## Keybindings
-
-| Key | Action |
-|-----|--------|
-| `q` / `Esc` | Quit |
-| `Tab` | Cycle panels |
-| `g` | Focus GPU panel |
-| `c` | Focus CPU panel |
-| `m` | Focus Memory panel |
-| `d` | Focus Disk panel |
-| `n` | Focus Network panel |
-| `p` | Focus Process table |
-| `s` | Cycle sort column in process table |
-| `/` | Filter processes |
-| `1-9` | Select GPU (multi-GPU systems) |
-| `?` | Help |
-
-## Roadmap
-
-- [x] Project architecture
-- [ ] Core metric collection (CPU, RAM, disk, net)
-- [ ] NVIDIA GPU metrics via NVML
-- [ ] Per-process GPU metrics via PDH (Windows)
-- [ ] TUI layout and rendering
-- [ ] Process table with GPU columns
-- [ ] AMD GPU support via ADLX
-- [ ] Linux GPU metrics (/sys/class/drm + NVML)
-- [ ] macOS support (IOKit + Metal)
-- [ ] Config file (refresh rate, layout, colors)
-- [ ] Historical graphs with configurable time window
-- [ ] Export metrics (JSON, CSV)
-- [ ] Alert rules (temp > X, throttle detected, etc.)
-
-## Why not just use...
-
-| Tool | Problem |
-|------|---------|
-| **Task Manager** | Shows one GPU percentage. No per-engine breakdown. No PCIe bandwidth. No thermals. No power. |
-| **HWiNFO** | Sensor dump in a GUI from 2004. No per-process GPU. Not a workflow tool. |
-| **Process Explorer** | Last real update was a decade ago. No GPU awareness at all. |
-| **btop** | Great on Linux. Windows support is a separate fork and an afterthought. No deep GPU. |
-| **bottom** | Good Rust TUI monitor. GPU support is surface-level (basic NVIDIA only). |
-| **nvidia-smi** | NVIDIA only. Text dump. No TUI. Per-process VRAM broken on consumer GPUs (WDDM). |
-| **Afterburner** | Overlay for games. Not a system monitor. No per-process. Being discontinued. |
-
-Pane replaces all of them.
+---
 
 ## Contributing
 
-Pane is open source under the MIT License.
+MIT License. Contributions welcome.
 
-If you want to contribute, the GPU metrics layer (`src/metrics/gpu/`) is where the interesting problems are. Per-process GPU attribution on Windows is a solved-but-poorly-documented problem — if you've worked with D3DKMT, PDH, NVML, or ADLX, your expertise is welcome.
+**High-impact areas:**
+- AMD GPU support (ADLX FFI)
+- Linux GPU depth (/sys/class/drm)
+- NVAPI integration (fan, clocks)
+- UI/UX and widget improvements
 
 ```bash
-# Run in dev mode
-cargo run
-
-# Run tests
-cargo test
-
-# Run with GPU features disabled (for CI / machines without GPUs)
-cargo run --no-default-features
+cargo run             # Debug
+cargo build --release # Release
+cargo clippy          # Zero warnings policy
 ```
-
-## License
-
-MIT License. See [LICENSE](LICENSE).
 
 ---
 
 <p align="center">
+  <img src="assets/loading.png" alt="Pane Loading" width="500">
+</p>
+
+<p align="center">
   <strong>Built by <a href="https://github.com/TxsharDev">Tushar Sharma</a></strong><br>
-  <em>Because your OS shouldn't hide what your hardware is doing.</em>
+  Your hardware is doing more than your OS wants you to see. Pane shows you all of it.
 </p>

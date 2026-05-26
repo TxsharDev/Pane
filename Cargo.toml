@@ -1,6 +1,6 @@
 [package]
 name = "pane"
-version = "1.0.0"
+version = "4.0.0"
 edition = "2024"
 authors = ["Tushar Sharma <Txshar@proton.me>"]
 description = "A transparent window into your system. Cross-platform GPU-aware system monitor."
@@ -10,13 +10,37 @@ readme = "README.md"
 keywords = ["system-monitor", "gpu", "tui", "performance", "nvidia"]
 categories = ["command-line-utilities", "hardware-support"]
 
+[[bin]]
+name = "pane"
+path = "src/main.rs"
+
+[[bin]]
+name = "pane-tui"
+path = "src/tui_main.rs"
+required-features = ["tui"]
+
 [dependencies]
-ratatui = "0.30"
-crossterm = "0.29"
+# GUI
+eframe = { version = "0.31", default-features = false, features = ["default_fonts", "glow", "persistence"] }
+egui_extras = { version = "0.31", features = ["image"] }
+egui_plot = "0.31"
+
+# TUI (optional, for pane-tui binary)
+ratatui = { version = "0.30", optional = true }
+crossterm = { version = "0.29", optional = true }
+
+# Core
 sysinfo = "0.34"
-tokio = { version = "1", features = ["full"] }
-clap = { version = "4", features = ["derive"] }
 color-eyre = "0.6"
+open = "5"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+dirs = "6"
+image = { version = "0.25", default-features = false, features = ["png"] }
+nvml-wrapper = "0.10"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+eframe = { version = "0.31", default-features = false, features = ["x11", "wayland"] }
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62", features = [
@@ -24,15 +48,14 @@ windows = { version = "0.62", features = [
     "Win32_Graphics_Direct3D",
 ] }
 
-[target.'cfg(target_os = "linux")'.dependencies]
-
 [features]
-default = ["nvidia"]
+default = ["nvidia", "tui"]
 nvidia = []
 amd = []
+tui = ["dep:ratatui", "dep:crossterm"]
 
 [profile.release]
 strip = true
 lto = true
-opt-level = "z"
+opt-level = 2
 codegen-units = 1

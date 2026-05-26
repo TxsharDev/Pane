@@ -1,1 +1,7 @@
 /target
+*.pdb
+.DS_Store
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
