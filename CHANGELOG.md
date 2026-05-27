@@ -2,6 +2,11 @@
 
 All notable changes to Pane will be documented here.
 
+## [4.0.1] - 2026-05-26
+
+### Fixed
+- **Windows executable icon** - embedded .ico resource via winresource so the icon shows on taskbar pins, file explorer, and downloaded .exe (was missing, only the runtime window icon worked)
+
 ## [4.0.0] - 2026-05-26 - First Public Release
 
 ### Added
